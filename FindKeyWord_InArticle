@@ -1,0 +1,120 @@
+from newspaper import Article
+from urllib.request import Request, urlopen
+from bs4 import BeautifulSoup
+from tkinter import *
+
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem.snowball import SnowballStemmer
+
+import re
+import string
+
+word_list=[]
+clean_words=[]
+
+
+# <중요 흐름 1. 기사 지문 수집>
+
+#설치는 처음에만 하면됨.
+#nltk.download('punkt')
+#nltk.download('stopwords')
+
+url = "https://www.bbc.com/news/world-asia-48863401"
+a = Article(url,decode="UTF-8")
+
+a.download()
+a.parse()
+
+#print(a.text)
+
+document = a.text
+
+# <중요 흐름 2. 불용어 제거 (조사, 접속사, 등 필요 없는 단어)>
+
+
+words = word_tokenize(document)
+word_values=[]
+
+i=0
+
+for word in words:
+    word = words[i].lower()
+    if word not in stopwords.words('english'):
+        clean_words.append(word)
+    #word_values[i]=word
+    i+=1
+#print(' '.join(clean_words))
+
+file = open('file.txt','w')
+file.write(','.join(clean_words))
+
+file.close()
+
+# 불용어 제거 : https://wikidocs.net/33735
+# 한국어 불용어 제거 : https://www.ranks.nl/stopwords/korean
+
+# <중요 흐름 3. 각 단어 별로 몇 번 나왔는지 출력>
+
+frequency = {}
+mainstory = {}
+
+document_text = open('file.txt','r')
+text_string = document_text.read()
+match_pattern = re.findall(r'\b[a-z]{3,15}\b', text_string)
+
+for word in match_pattern:
+    count = frequency.get(word,0)
+    frequency[word] = count + 1
+     
+frequency_list = frequency.keys()
+ 
+#for words in frequency_list:
+    #print (words, frequency[words])
+
+
+#frequency는 딕셔너리
+
+mainstory = sorted(frequency.items(), key=lambda t : t[1],reverse=True)
+
+#print(mainstory[:10])
+
+
+#### 윈도우 창에 띄우기
+window = Tk()
+
+window.title("기사 키워드 찾기 (Top 10)")
+
+label=[]
+
+label_title = Label(window,text="키워드 TOP 10")
+label1 = Label(window,text=mainstory[0])
+label2 = Label(window,text=mainstory[1])
+label3 = Label(window,text=mainstory[2])
+label4 = Label(window,text=mainstory[3])
+label5 = Label(window,text=mainstory[4])
+label6 = Label(window,text=mainstory[5])
+label7 = Label(window,text=mainstory[6])
+label8 = Label(window,text=mainstory[7])
+label9 = Label(window,text=mainstory[8])
+label10 = Label(window,text=mainstory[9])
+label11 = Label(window,text=mainstory[10])
+
+
+label_title.pack()
+label1.pack()
+label2.pack()
+label3.pack()
+label4.pack()
+label5.pack()
+label6.pack()
+label7.pack()
+label8.pack()
+label9.pack()
+label10.pack()
+label11.pack()
+window.mainloop()
+
+
+
